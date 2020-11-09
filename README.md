@@ -1,4 +1,4 @@
-#STEGOsaurus
+# STEGOsaurus
 
 Hello, and welcome to stegosaurus! Within this file we have included everything
 that you will need to start hiding secret strings in an image. Included within
