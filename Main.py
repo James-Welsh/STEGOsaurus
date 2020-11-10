@@ -111,7 +111,7 @@ def decode():
             quit()
         
         elif ans == "v":
-            print("Decoded message:\n\n" + messageString + "\n\n")
+            print("Decoded message:\n\n" + messageString + "\n\n[End of decoded message]\n\n\n")
             break
         
         elif ans == "t":
@@ -150,7 +150,7 @@ def getImageBinary():
                 
                 # Check file has .bmp extension
                 if validPath and (filePath[-4:]) == ".bmp": 
-                    print("image found :)\n")
+                    print("\nImage found.\n")
                     return imageByteArray
                 
                 # If path was valid but file does not have the bmp extension
@@ -172,7 +172,8 @@ Takes the imageByteArray as an argument, and the number of bytes to read and
 returns the hidden message as a string.
 """
 def getSecretMessage(imageByteArray, length):
-    secretSlice = imageByteArray[86:(86 + length)] #Slice containing the string
+    # Slice containing the string
+    secretSlice = imageByteArray[86:(86 + length)] 
     arrayOfChars = []
     noOfChars = int(length / 8)
     count = 0
@@ -181,18 +182,18 @@ def getSecretMessage(imageByteArray, length):
         newChar = ""
 
         for j in range(8):
-            #Append the LSB for each byte read to the string representing the
-            #eight bit extended ASCII value.
+            # Append the LSB for each byte read to the string representing the
+            # 8-bit extended ASCII value.
             newChar += (bin(secretSlice[count+j]))[-1]
         
-        #Convert the string representing the 8bit binary value to decimal
+        # Convert the string representing the 8bit binary value to decimal
         arrayOfChars += [int(newChar, 2)]
-        count += 8 #Move to next byte
+        count += 8 # Move to next byte
 
     secretMessage = ""
 
     for char in arrayOfChars:
-        #Append the character represented by the ASCII value to the string
+        # Append the character represented by the ASCII value to the string
         secretMessage += chr(char)
 
     return secretMessage
@@ -205,12 +206,13 @@ Takes no arguments and returns a string.
 def getStringFromTerminal():
         
     while True:
-        answer =  input("Please type your message, followed by Enter:\n")
+        answer = input("Please type your message, followed by Enter:\n")
 
         if len(answer) == 0:
+            # Allows the user to encode an empty string, but checks to make sure
             check = input(
                 "You have not entered any text.\n" +
-                "Type 'c' to continue or 't' to type a new message:\n"
+                "Type 'c' to continue anyway or 't' to type a new message:\n"
             )
             
             check = sanitiseInput(check)
@@ -236,13 +238,13 @@ Either by importing a .txt file or by typing a string in the command line.
 Takes no arguments and returns a string.
 """
 def getMessageString():
-    
     # Check if the user would like to type a string or use a text file.
     while True:
         fileOrType = input(
                 "\nWould you like to encode a text file or type the message to be encoded?\n" +
                 "Please type 'f' for a .txt file, or 't' to type your own, follwed by Enter.\n"
             )
+
         fileOrType = sanitiseInput(fileOrType)
 
         if fileOrType == "q":
@@ -253,20 +255,8 @@ def getMessageString():
             return getStringFromTerminal()
         
         elif fileOrType == "f":
-            # Open the referenced text file and return the contents
-            while True:
-                messageFile = input("Please enter the full path to your text file, followed by Enter:\n")
-                if sanitiseInput(messageFile)[-4:] != ".txt":
-                    print(
-                        "File referenced is not a .txt file, or the extension is missing.\n" +
-                        "Please try again.\n"
-                    )
-                else:
-                    break
-                    
-            with open(messageFile, 'r') as message:
-                messageString = message.read()
-                return messageString
+            # Ask the user for a text file and return the contents as a string
+            return getStringFromTextFile()
         
         else:
             print(
@@ -274,6 +264,29 @@ def getMessageString():
                 "~~~~~~~~~~~~~~~~~~~~~~~~"
             )
             continue
+
+
+"""
+Retrieves the contents of a .txt file as a string.
+"""
+def getStringFromTextFile():
+    # Open the referenced text file and return the contents
+    while True:
+        messageFile = input("Please enter the full path to your text file, followed by Enter:\n")
+        
+        # Check that the file has the .txt extension
+        if sanitiseInput(messageFile)[-4:] != ".txt":
+            print(
+                "File referenced is not a .txt file, or the extension is missing.\n" +
+                "Please try again.\n"
+            )
+        else:
+            break
+                    
+    with open(messageFile, 'r') as message:
+        messageString = message.read()
+        return messageString
+
 
 
 """
@@ -394,9 +407,10 @@ def getSecretMessageLength(imageByteArray):
 
     return int(sizeAsBinary, 2)
 
-'''
+
+"""
 Makes sure that user inputs in capitals or with spaces are still recognised.
-'''
+"""
 def sanitiseInput(inputString):
     return inputString.lower().strip()
 
